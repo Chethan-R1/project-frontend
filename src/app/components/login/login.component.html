@@ -1,0 +1,14 @@
+<div class="login-wrapper">
+  <h2>Enter as Guest</h2>
+
+  <form (ngSubmit)="onGuestLogin()" #guestForm="ngForm">
+    <input
+      type="text"
+      name="guestName"
+      [(ngModel)]="guestName"
+      placeholder="Enter your name"
+      required
+    />
+    <button type="submit" [disabled]="!guestForm.form.valid">Continue</button>
+  </form>
+</div>

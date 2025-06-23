@@ -1,0 +1,54 @@
+.container {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 20px;
+  background: #f7f7f7;
+  border-radius: 10px;
+}
+
+h2 {
+  text-align: center;
+}
+
+.form-group {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+input {
+  flex: 1;
+  padding: 8px;
+}
+
+button {
+  padding: 8px 12px;
+  cursor: pointer;
+  border: none;
+  background: #e0e0e0;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  margin-bottom: 10px;
+  background: #fff;
+  padding: 10px;
+  border-radius: 6px;
+}
+
+.table-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}

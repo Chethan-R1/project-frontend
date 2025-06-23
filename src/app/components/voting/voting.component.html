@@ -1,0 +1,79 @@
+
+<div class="container">
+  <div class="voting-section">
+    <h2>Voting Room: {{ roomId }}</h2>
+    <div class="timer-control" *ngIf="currentStoryIndex !== null">
+      <p><strong>Timer:</strong> {{ getTimerFormatted() }}</p>
+      <button (click)="startVoting()" [disabled]="votingStarted">Start Voting</button>
+      <button (click)="stopVoting()" [disabled]="!votingStarted">Stop Voting</button>
+    </div>
+
+    <div class="voting-area">
+      <h3 *ngIf="currentStoryIndex !== null">Story: {{ stories[currentStoryIndex].storyName }}</h3>
+      <h3 *ngIf="currentStoryIndex === null" class="disabled-heading">Select a story to begin</h3>
+
+      <div class="tiles">
+        <button
+          *ngFor="let v of votes"
+          (click)="vote(v)"
+          [disabled]="!votingStarted"
+        >
+          {{ v }}
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="!votingStarted && currentStoryIndex === null" class="story-wait">
+      <p>Select a story from the right to start voting.</p>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h3>Add Story</h3>
+    <div class="story-prompt">
+      <input [(ngModel)]="story" placeholder="Enter a story to vote on" />
+      <button (click)="addStory()">Add</button>
+    </div>
+
+    <div class="story-list">
+      <h4>Stories</h4>
+      <ul>
+        <li *ngFor="let s of stories; let i = index">
+          <span (click)="setStory(i)" [class.active]="currentStoryIndex === i">{{ s.storyName }}</span>
+          <button (click)="editStory(i)">✎</button>
+          <button (click)="deleteStory(i)">🗑</button>
+        </li>
+      </ul>
+    </div>
+
+    <div class="invite-section">
+      <label>Invite Link:</label>
+      <input type="text" [value]="getInviteLink()" readonly (click)="selectInput($event)" />
+      <button (click)="copyInviteLink()">Copy</button>
+    </div>
+  </div>
+</div>
+
+<!-- Voting Results -->
+<div class="results" *ngIf="selectedVote.length > 0">
+  <h3>Voting Results</h3>
+  <ul>
+    <li *ngFor="let vote of selectedVote">
+      <strong>{{ vote.user.username }}</strong> voted: {{ vote.voteValue }}
+    </li>
+  </ul>
+  <button (click)="clearVotes()">Clear Results</button>
+</div>
+
+<!-- Modal for editing story -->
+<div class="modal-overlay" *ngIf="editingIndex !== null">
+  <div class="modal">
+    <h3>Edit Story</h3>
+    <input [(ngModel)]="storyEditText" />
+    <div class="modal-buttons">
+      <button (click)="saveEditedStory()">Save</button>
+      <button (click)="cancelEdit()">Cancel</button>
+    </div>
+  </div>
+</div>
