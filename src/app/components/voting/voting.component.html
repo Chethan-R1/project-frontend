@@ -1,7 +1,7 @@
 
 <div class="container">
   <div class="voting-section">
-    <h2>Voting Room: {{ roomId }}</h2>
+    <h2>Voting Room: {{ tableName }}</h2>
     <div class="timer-control" *ngIf="currentStoryIndex !== null">
       <p><strong>Timer:</strong> {{ getTimerFormatted() }}</p>
       <button (click)="startVoting()" [disabled]="votingStarted">Start Voting</button>
@@ -33,6 +33,7 @@
     <h3>Add Story</h3>
     <div class="story-prompt">
       <input [(ngModel)]="story" placeholder="Enter a story to vote on" />
+     
       <button (click)="addStory()">Add</button>
     </div>
 
@@ -52,6 +53,16 @@
       <input type="text" [value]="getInviteLink()" readonly (click)="selectInput($event)" />
       <button (click)="copyInviteLink()">Copy</button>
     </div>
+
+  <div class="joined-users">
+  <h3>Users in Room</h3>
+  <ul>
+    <li *ngFor="let user of usersInRoom">
+      👤 {{ user.name }}
+    </li>
+  </ul>
+  </div>
+
   </div>
 </div>
 

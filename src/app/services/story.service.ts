@@ -16,11 +16,11 @@ export class StoryService {
     return this.http.get<Story[]>(this.baseUrl);
   }
 
-    getByRoomId(roomId: number): Observable<Story[]> {
-    return this.http.get<Story[]>(`${this.baseUrl}/room/${roomId}`);
+    getByRoomId(planTableId: string): Observable<Story[]> {
+    return this.http.get<Story[]>(`${this.baseUrl}/planTable/${planTableId}`);
   }
 
-  create(story: Partial<Story>): Observable<Story> {
+  create(story:any): Observable<Story> {
     return this.http.post<Story>(this.baseUrl, story);
   }
 

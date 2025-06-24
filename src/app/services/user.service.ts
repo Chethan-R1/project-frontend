@@ -12,10 +12,19 @@ export class UserService {
 
   constructor(private http: HttpClient) {}
 
+  getUserByRoomId(roomId: string): Observable<User[]> {
+  return this.http.get<User[]>(`http://localhost:8080/api/members/users/${roomId}`);
+}
+
+
   getOrCreateUser(name: string): Observable<User> {
   return this.http.get<User>(`${this.apiUrl}/name/${name}`).pipe(
     catchError(() => this.createUser({ name, id: '' }))  // If not found, create
   );
+}
+
+  getUsersByRoomId(roomId: string): Observable<User[]> {
+  return this.http.get<User[]>(`${this.apiUrl}/room/${roomId}`);
 }
 
 

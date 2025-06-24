@@ -2,7 +2,7 @@ export interface PlanningTable {
   id: number;
   tableName: string;
   user?: {
-    id: number;
+    id: string;
     name?: string; 
   };
   organization?: string;

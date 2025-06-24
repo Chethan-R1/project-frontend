@@ -1,5 +1,5 @@
 <div class="login-wrapper">
-  <h2>Enter as Guest</h2>
+  <h2>Welcome to PlanITPoker</h2>
 
   <form (ngSubmit)="onGuestLogin()" #guestForm="ngForm">
     <input
@@ -9,6 +9,13 @@
       placeholder="Enter your name"
       required
     />
-    <button type="submit" [disabled]="!guestForm.form.valid">Continue</button>
+    <button type="submit" [disabled]="!guestForm.form.valid">Continue as Guest</button>
   </form>
+
+   <div class="divider">  </div>
+   <hr>
+  <div class="button-group">
+    <button class="main-button" (click)="navigateToSignup()">Login / Signup</button>
+  </div>
+
 </div>

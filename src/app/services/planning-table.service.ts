@@ -11,7 +11,12 @@ export class PlanningTableService {
 
   constructor(private http: HttpClient) {}
 
-  getByUser(userId: number): Observable<PlanningTable[]> {
+  getById(id: string): Observable<PlanningTable> {
+  return this.http.get<PlanningTable>(`${this.apiUrl}/${id}`);
+}
+
+
+  getByUser(userId: string): Observable<PlanningTable[]> {
   return this.http.get<PlanningTable[]>(`${this.apiUrl}/user/${userId}`);
 }
 

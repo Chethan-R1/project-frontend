@@ -31,3 +31,36 @@
 .user-icon {
   font-size: 1.3rem;
 }
+
+.user-section {
+  position: relative;
+  cursor: pointer;
+}
+
+.dropdown {
+  position: absolute;
+  top: 40px;
+  right: 0;
+  background-color: rgb(255, 255, 255);
+  border: 1px solid #ffffff;
+  color: black;
+  z-index: 1000;
+  width: 150px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.dropdown ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.dropdown li {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+}
+
+.dropdown li:hover {
+  background-color: #638ce5;
+}

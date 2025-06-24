@@ -30,7 +30,7 @@ export class PlanningTableComponent implements OnInit {
   loadTables(): void {
     const userId = localStorage.getItem('userId');
     if (userId) {
-      this.service.getByUser(+userId).subscribe({
+      this.service.getByUser(userId).subscribe({
         next: (tables) => {
           console.log('User-specific tables:', tables);
           this.tables = tables;
@@ -51,11 +51,12 @@ export class PlanningTableComponent implements OnInit {
 
     const table = {
       tableName: this.newTableName,
-      user: { id: +userId }
+      user: {id:userId} 
     };
 
     this.service.create(table).subscribe({
-      next: () => {
+      next: (res) => {
+        console.log(res)
         this.newTableName = '';
         this.loadTables();
       },

@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { LoginComponent } from './components/login/login.component';
+import { authGuard } from './auth.guard'; // adjust path as needed
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -12,18 +13,11 @@ export const routes: Routes = [
       ),
   },
   {
-  path: 'room/:roomId',
-  loadComponent: () =>
-    import('./components/voting/voting.component').then(
-      (m) => m.VotingComponent
-    ),
-}
-
-  // {
-  //   path: 'voting',
-  //   loadComponent: () =>
-  //     import('./components/voting/voting.component').then(
-  //       (m) => m.VotingComponent
-  //     ),
-  // },
+    path: 'room/:roomId',
+    canActivate: [authGuard], 
+    loadComponent: () =>
+      import('./components/voting/voting.component').then(
+        (m) => m.VotingComponent
+      ),
+  }
 ];

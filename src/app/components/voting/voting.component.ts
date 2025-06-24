@@ -4,6 +4,10 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { StoryService } from '../../services/story.service';
 import { Story } from '../../models/story.model';
+import { PlanningTableService } from '../../services/planning-table.service';
+import { User } from '../../models/user.model';
+import { HttpClient } from '@angular/common/http';
+import { UserService } from '../../services/user.service';
 
 interface Vote {
   voteId: number;
@@ -25,7 +29,7 @@ interface DisplayStory {
 })
 export class VotingComponent implements OnInit {
   roomId: string = '';
-  planTableId: number = 0;
+  planTableId: string = '';
   votes: (number | string)[] = [0, 0.5, 1, 2, 3, 5, 8, 13, 20, 40, 100, '?'];
   selectedVote: Vote[] = [];
   story: string = '';
@@ -33,26 +37,57 @@ export class VotingComponent implements OnInit {
   currentStoryIndex: number | null = null;
   editingIndex: number | null = null;
   storyEditText: string = '';
+  tableName: string = '';
+  usersInRoom: User[] = [];
+
+  
 
   timer: number = 0;
   timerInterval: any;
   votingStarted: boolean = false;
+  // userService: any;
 
-  constructor(private route: ActivatedRoute, private storyService: StoryService) {}
+  constructor(private route: ActivatedRoute,
+     private storyService: StoryService,
+    private planningTableService: PlanningTableService,
+    private http: HttpClient,                    
+    private userService: UserService  ) {}
 
   ngOnInit() {
     this.roomId = this.route.snapshot.paramMap.get('roomId') || '';
     const match = this.roomId.match(/(\d+)$/);
-    this.planTableId = match ? parseInt(match[1], 10) : 0;
+    this.planTableId = localStorage.getItem('selectedTableId') || '';
+    // const plantableId = this.planTableId;
+    this.planTableId = this.roomId;
 
   console.log('Full route param (roomId):', this.roomId);
   console.log('Extracted numeric planTableId:', this.planTableId);
 
+  localStorage.setItem('selectedTableId', this.planTableId);
+
+    this.loadTableName();
     this.loadStories();
+    this.addMemberToRoom();     
+    this.loadUsersInRoom();
+    // this.loadUsersInRoom();
   }
+
+  loadTableName() {
+  this.planningTableService.getById(this.planTableId).subscribe({
+    next: (table) => {
+      this.tableName = table.tableName;
+    },
+    error: (err) => {
+      console.error('Failed to fetch table by ID', err);
+      this.tableName = this.planTableId;
+    }
+  });
+}
+
 
   loadStories() {
     this.storyService.getByRoomId(this.planTableId).subscribe(data => {
+      console.log(data)
       this.stories = data.map(story => ({
         storyId: story.storyId,
         storyName: story.title
@@ -60,22 +95,31 @@ export class VotingComponent implements OnInit {
     });
   }
 
-addStory() {
-  if (this.story.trim()) {
+  addStory() {
+  const userId = localStorage.getItem('userId');
+  const plantableId = this.planTableId;
+  // const plantableId=localStorage.getItem('selectedTableId')
+  console.log("add story clicked")
+  console.log(this.story)
+  if (this.story.trim() && userId) {
     const newStory = {
       title: this.story,
       description: '',
-      planTable: { id: this.planTableId } // <-- key field
+      planTable: { id: plantableId},
+      createdBy: { userId: userId } 
     };
+    console.log("New story",newStory)
 
     this.storyService.create(newStory).subscribe({
       next: (createdStory: Story) => {
-        this.stories.push({ storyId: createdStory.storyId, storyName: createdStory.title });
-        this.story = '';
+        console.log("Story creadted",createdStory);
+        // this.stories.push({ storyId: createdStory.storyId, storyName: createdStory.title });
+        // this.story = '';
+        this.loadStories();
       },
       error: (err) => {
         console.error('Failed to create story:', err);
-        alert('Could not add story. Please make sure the room exists.');
+        alert(err.error || 'Could not add story. Please make sure the room exists and you are the owner.');
       }
     });
   }
@@ -178,4 +222,42 @@ addStory() {
     const input = event.target as HTMLInputElement;
     input.select();
   }
+
+  addMemberToRoom() {
+  const userId = localStorage.getItem('userId');
+  const tableId = this.planTableId;
+
+  if (userId && tableId) {
+    this.http.post('http://localhost:8080/api/members', {
+      userId,
+      tableId
+    }).subscribe({
+      next: () => {
+        console.log('User added or already present');
+        this.loadUsersInRoom(); // refresh list after adding
+      },
+      error: (err) => console.error('Error adding user to room', err)
+    });
+  }
+}
+
+
+//   loadUsersInRoom() {
+//   this.userService.getUsersByRoomId(this.planTableId).subscribe({
+//     next: (users: User[]) => {
+//       this.usersInRoom = users;
+//     },
+//     error: (err: any) => {
+//       console.error('Failed to load users in room', err);
+//     }
+//   });
+// }
+
+loadUsersInRoom() {
+  this.userService.getUserByRoomId(this.planTableId).subscribe({
+    next: (users: User[]) => this.usersInRoom = users,
+    error: (err: any) => console.error('Failed to load users:', err)
+  });
+}
+
 }
