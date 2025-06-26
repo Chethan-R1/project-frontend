@@ -1,1 +1,16 @@
 /* You can add global styles to this file, and also import other style files */
+:root {
+  --header-bg: #ffffff;
+  --dropdown-bg: #f9f9f9;
+  --text-color: #222;
+  --hover-bg: #ececec;
+}
+
+body.dark-mode {
+  --header-bg: #1e1e1e;
+  --dropdown-bg: #2a2a2a;
+  --text-color: #f0f0f0;
+  --hover-bg: #333;
+  background-color: #121212;
+  color: #f0f0f0;
+}

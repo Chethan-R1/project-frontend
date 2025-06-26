@@ -19,5 +19,15 @@ export const routes: Routes = [
       import('./components/voting/voting.component').then(
         (m) => m.VotingComponent
       ),
-  }
+  },
+
+  {
+  path: 'create-account',
+  loadComponent: () => import('./components/signup/signup.component').then(m => m.SignupComponent)
+},
+{
+  path: 'login-user',
+  loadComponent: () => import('./components/login-user/login-user.component').then(m => m.LoginUserComponent)
+}
+
 ];

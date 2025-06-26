@@ -1,6 +1,7 @@
 <div class="login-wrapper">
   <h2>Welcome to PlanITPoker</h2>
 
+  <!-- Guest Login -->
   <form (ngSubmit)="onGuestLogin()" #guestForm="ngForm">
     <input
       type="text"
@@ -9,13 +10,77 @@
       placeholder="Enter your name"
       required
     />
-    <button type="submit" [disabled]="!guestForm.form.valid">Continue as Guest</button>
+    <button type="submit" [disabled]="!guestForm.valid">
+      Continue as Guest
+    </button>
   </form>
 
-   <div class="divider">  </div>
-   <hr>
+  <div class="divider"></div>
+  <hr />
+
+  <!-- Unified Auth Button -->
   <div class="button-group">
-    <button class="main-button" (click)="navigateToSignup()">Login / Signup</button>
+    <button class="main-button" (click)="toggleLoginForm()">
+      Login / Signup
+    </button>
   </div>
 
+  <!-- Login Form -->
+  <div *ngIf="showLoginForm" class="auth-section fade-in">
+    <form (ngSubmit)="onLogin()" #loginForm="ngForm">
+      <input
+        type="email"
+        [(ngModel)]="loginEmail"
+        name="loginEmail"
+        placeholder="Email"
+        required
+      />
+      <input
+        type="password"
+        [(ngModel)]="loginPassword"
+        name="loginPassword"
+        placeholder="Password"
+        required
+      />
+      <button type="submit" [disabled]="!loginForm.valid">Login</button>
+    </form>
+
+    <p class="auth-toggle">
+      Don't have an account?
+      <a href="#" (click)="switchToSignup($event)">Sign up</a>
+    </p>
+  </div>
+
+  <!-- Signup Form -->
+  <div *ngIf="showSignupForm" class="auth-section fade-in">
+    <form (ngSubmit)="onSignup()" #signupForm="ngForm">
+      <input
+        type="text"
+        [(ngModel)]="signupName"
+        name="signupName"
+        placeholder="Name"
+        required
+      />
+      <input
+        type="email"
+        [(ngModel)]="signupEmail"
+        name="signupEmail"
+        placeholder="Email"
+        required
+      />
+      <input
+        type="password"
+        [(ngModel)]="signupPassword"
+        name="signupPassword"
+        placeholder="Password"
+        required
+      />
+      <button type="submit" [disabled]="!signupForm.valid">Create Account</button>
+    </form>
+
+    <p class="auth-toggle">
+      Already have an account?
+      <a href="#" (click)="switchToLogin($event)">Login</a>
+    </p>
+  </div>
 </div>

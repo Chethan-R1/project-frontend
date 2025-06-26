@@ -2,7 +2,7 @@ import { PlanningTable } from "./planning-table.model";
 
 // models/story.model.ts
 export interface Story {
-  storyId: number;
+  storyId: string;
   title: string;
   description: string;
   storyPoint?: number;

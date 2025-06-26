@@ -1,12 +1,50 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="light">
 <head>
   <meta charset="utf-8">
   <title>Project</title>
   <base href="/">
+
+  <!-- Responsive -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Favicon -->
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+
+  <!-- FontAwesome -->
+
+
+
+
+  <!-- Optional: preload fontawesome for performance -->
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+
+  <!-- Optional Dark Mode Base Styling -->
+  <style>
+    :root {
+      --bg: #ffffff;
+      --text: #222;
+      --input-bg: #f4f4f4;
+      --border: #ccc;
+    }
+
+    .dark-mode {
+      --bg: #1e1e1e;
+      --text: #f0f0f0;
+      --input-bg: #2a2a2a;
+      --border: #444;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      font-family: Arial, sans-serif;
+      transition: background-color 0.3s, color 0.3s;
+    }
+  </style>
 </head>
+
 <body>
   <app-root></app-root>
 </body>

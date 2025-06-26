@@ -24,11 +24,11 @@ export class StoryService {
     return this.http.post<Story>(this.baseUrl, story);
   }
 
-  update(id: number, story: Partial<Story>): Observable<Story> {
+  update(id: string, story: Partial<Story>): Observable<Story> {
     return this.http.put<Story>(`${this.baseUrl}/${id}`, story);
   }
 
-  delete(id: number): Observable<void> {
+  delete(id: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
 }

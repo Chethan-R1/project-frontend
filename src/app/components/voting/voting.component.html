@@ -1,90 +1,236 @@
-
+<!-- enhanced-voting-room.component.html -->
 <div class="container">
+  <!-- Connection Status Indicator -->
+  <div class="connection-status" [class.connected]="isConnected" [class.disconnected]="!isConnected">
+    <span class="status-indicator"></span>
+    {{ isConnected ? 'Connected' : 'Disconnected' }}
+  </div>
+
   <div class="voting-section">
     <h2>Voting Room: {{ tableName }}</h2>
+    
+    <!-- Enhanced Timer Control with Real-time Updates -->
     <div class="timer-control" *ngIf="currentStoryIndex !== null">
       <p><strong>Timer:</strong> {{ getTimerFormatted() }}</p>
-      <button (click)="startVoting()" [disabled]="votingStarted">Start Voting</button>
-      <button (click)="stopVoting()" [disabled]="!votingStarted">Stop Voting</button>
+      <div class="moderator-controls" *ngIf="isModerator">
+        <button (click)="startVoting()" [disabled]="votingStarted || !isConnected">
+          {{ isConnected ? 'Start Voting' : 'Connecting...' }}
+        </button>
+        <button (click)="stopVoting()" [disabled]="!votingStarted || !isConnected">Stop Voting</button>
+        <button (click)="revealVotes()" [disabled]="!votingStarted || votesRevealed || !isConnected">
+          Reveal Votes
+        </button>
+        <button (click)="clearVotes()" [disabled]="!isConnected">Reset Votes</button>
+      </div>
+      <div class="participant-info" *ngIf="!isModerator">
+        <span class="voting-status" [class.active]="votingStarted">
+          {{ votingStarted ? 'Voting in Progress' : 'Waiting for Moderator' }}
+        </span>
+      </div>
     </div>
 
+    <!-- Enhanced Voting Area with Real-time Status -->
     <div class="voting-area">
       <h3 *ngIf="currentStoryIndex !== null">Story: {{ stories[currentStoryIndex].storyName }}</h3>
       <h3 *ngIf="currentStoryIndex === null" class="disabled-heading">Select a story to begin</h3>
 
+      <!-- Vote Status Indicator -->
+      <div class="vote-status-bar" *ngIf="votingStarted">
+        <p>Your vote: 
+          <span *ngIf="currentUserVote" class="current-vote">{{ currentUserVote }}</span>
+          <span *ngIf="!currentUserVote" class="no-vote">Not voted yet</span>
+        </p>
+      </div>
+
+      <!-- Voting Tiles -->
       <div class="tiles">
         <button
           *ngFor="let v of votes"
           (click)="vote(v)"
-          [disabled]="!votingStarted"
+          [disabled]="!votingStarted || !isConnected || votesRevealed"
+          [class.selected]="currentUserVote === v"
+          [class.disabled]="!votingStarted || !isConnected"
         >
           {{ v }}
         </button>
       </div>
+
+      <!-- Real-time Voting Progress -->
+      <div class="voting-progress" *ngIf="votingStarted && userVoteStatuses.size > 0">
+        <h4>Voting Progress</h4>
+        <div class="progress-grid">
+          <div 
+            *ngFor="let user of usersInRoom" 
+            class="user-vote-status"
+            [class.voted]="hasUserVoted(user.id)"
+            [class.revealed]="votesRevealed">
+            
+            <span class="user-name">{{ user.name }}</span>
+            <span class="vote-indicator">
+              <span *ngIf="!hasUserVoted(user.id)" class="waiting">⏳</span>
+              <span *ngIf="hasUserVoted(user.id) && !votesRevealed" class="voted-hidden">✅</span>
+              <span *ngIf="hasUserVoted(user.id) && votesRevealed" class="vote-value">
+                {{ getUserVoteValue(user.id) || '?' }}
+              </span>
+            </span>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div *ngIf="!votingStarted && currentStoryIndex === null" class="story-wait">
-      <p>Select a story from the right to start voting.</p>
+      <p>{{ isModerator ? 'Select a story from the right to start voting.' : 'Waiting for moderator to select a story.' }}</p>
     </div>
   </div>
 
-  <!-- Sidebar -->
+  <!-- Enhanced Sidebar -->
   <div class="sidebar">
-    <h3>Add Story</h3>
-    <div class="story-prompt">
-      <input [(ngModel)]="story" placeholder="Enter a story to vote on" />
-     
-      <button (click)="addStory()">Add</button>
+    <!-- Story Management (Moderator Only) -->
+    <div class="story-management" *ngIf="isModerator">
+      <h3>Add Story</h3>
+      <div class="story-prompt">
+        <input 
+          [(ngModel)]="story" 
+          placeholder="Enter a story to vote on"
+          [disabled]="!isConnected"
+          (keyup.enter)="addStory()" />
+        <button (click)="addStory()" [disabled]="!story.trim() || !isConnected">Add</button>
+      </div>
     </div>
 
+    <!-- Story List -->
     <div class="story-list">
       <h4>Stories</h4>
+      <div class="story-count" *ngIf="stories.length > 0">
+        {{ stories.length }} story(ies) • 
+        <span *ngIf="currentStoryIndex !== null">Current: {{ stories[currentStoryIndex].storyName }}</span>
+        <span *ngIf="currentStoryIndex === null">No story selected</span>
+      </div>
+      
       <ul>
-        <li *ngFor="let s of stories; let i = index">
-          <span (click)="setStory(i)" [class.active]="currentStoryIndex === i">{{ s.storyName }}</span>
-          <button (click)="editStory(i)">✎</button>
-          <button (click)="deleteStory(i)">🗑</button>
+        <li *ngFor="let s of stories; let i = index" [class.current-story]="currentStoryIndex === i">
+          <span 
+            (click)="isModerator ? setStory(i) : null" 
+            [class.active]="currentStoryIndex === i"
+            [class.clickable]="isModerator"
+            [class.disabled]="!isModerator">{{ s.storyName }}</span>
+          
+          <div class="story-actions" *ngIf="isModerator">
+            <button (click)="editStory(i)" [disabled]="!isConnected" title="Edit Story">✎</button>
+            <button (click)="deleteStory(i)" [disabled]="!isConnected" title="Delete Story">🗑</button>
+          </div>
+        </li>
+      </ul>
+      
+      <div class="no-stories" *ngIf="stories.length === 0">
+        <p>{{ isModerator ? 'Add stories to begin voting' : 'No stories added yet' }}</p>
+      </div>
+    </div>
+
+    <!-- Invite Section -->
+    <div class="invite-section">
+      <label>Invite Link:</label>
+      <div class="invite-controls">
+        <input 
+          type="text" 
+          [value]="getInviteLink()" 
+          readonly 
+          (click)="selectInput($event)" 
+          class="invite-input" />
+        <button (click)="copyInviteLink()" class="copy-btn">Copy</button>
+      </div>
+    </div>
+
+    <!-- Enhanced Users in Room with Real-time Status -->
+    <div class="joined-users">
+      <h3>Users in Room ({{ usersInRoom.length }})</h3>
+      <div class="connection-info">
+        <span class="connection-indicator" [class.connected]="isConnected"></span>
+        {{ isConnected ? 'Live Updates Active' : 'Reconnecting...' }}
+      </div>
+      
+      <ul class="user-list">
+        <li *ngFor="let user of usersInRoom" [class.current-user]="user.id === currentUserId">
+          <div class="user-info">
+            <span class="user-avatar">👤</span>
+            <span class="user-details">
+              <span class="user-name">{{ user.name }}</span>
+              <span class="user-role" *ngIf="user.id === currentUserId">(You)</span>
+              <span class="user-role moderator" *ngIf="isModerator && user.id === currentUserId">(Moderator)</span>
+            </span>
+          </div>
+          
+          <!-- Real-time vote status -->
+          <div class="user-vote-status" *ngIf="votingStarted">
+            <span *ngIf="!hasUserVoted(user.id)" class="status-waiting">⏳</span>
+            <span *ngIf="hasUserVoted(user.id) && !votesRevealed" class="status-voted">✅</span>
+            <span *ngIf="hasUserVoted(user.id) && votesRevealed" class="status-revealed">
+              {{ getUserVoteValue(user.id) || '?' }}
+            </span>
+          </div>
+          
+          <!-- Moderator Controls -->
+          <button 
+            *ngIf="isModerator && user.id !== currentUserId" 
+            (click)="removeUser(user.id)"
+            [disabled]="!isConnected"
+            class="remove-user-btn"
+            title="Remove User">
+            Remove
+          </button>
         </li>
       </ul>
     </div>
-
-    <div class="invite-section">
-      <label>Invite Link:</label>
-      <input type="text" [value]="getInviteLink()" readonly (click)="selectInput($event)" />
-      <button (click)="copyInviteLink()">Copy</button>
-    </div>
-
-  <div class="joined-users">
-  <h3>Users in Room</h3>
-  <ul>
-    <li *ngFor="let user of usersInRoom">
-      👤 {{ user.name }}
-    </li>
-  </ul>
-  </div>
-
   </div>
 </div>
 
-<!-- Voting Results -->
-<div class="results" *ngIf="selectedVote.length > 0">
+<!-- Enhanced Voting Results with Real-time Updates -->
+<div class="results" *ngIf="votesRevealed && selectedVote.length > 0">
   <h3>Voting Results</h3>
-  <ul>
-    <li *ngFor="let vote of selectedVote">
-      <strong>{{ vote.user.username }}</strong> voted: {{ vote.voteValue }}
-    </li>
-  </ul>
-  <button (click)="clearVotes()">Clear Results</button>
+  <div class="results-summary">
+    <div class="vote-distribution">
+      <div class="vote-stats">
+        <span>Total Votes: {{ selectedVote.length }}</span>
+        <span>Participants: {{ usersInRoom.length }}</span>
+        <span>Response Rate: {{ Math.round((selectedVote.length / usersInRoom.length) * 100) }}%</span>
+      </div>
+    </div>
+    
+    <div class="individual-votes">
+      <div *ngFor="let vote of selectedVote" class="vote-result">
+        <span class="voter-name">{{ vote.user.username }}</span>
+        <span class="vote-value">{{ vote.voteValue }}</span>
+      </div>
+    </div>
+  </div>
+  
+  <div class="results-actions" *ngIf="isModerator">
+    <button (click)="clearVotes()" [disabled]="!isConnected">Clear Results</button>
+  </div>
 </div>
 
 <!-- Modal for editing story -->
-<div class="modal-overlay" *ngIf="editingIndex !== null">
-  <div class="modal">
+<div class="modal-overlay" *ngIf="editingIndex !== null" (click)="cancelEdit()">
+  <div class="modal" (click)="$event.stopPropagation()">
     <h3>Edit Story</h3>
-    <input [(ngModel)]="storyEditText" />
+    <input 
+      [(ngModel)]="storyEditText" 
+      (keyup.enter)="saveEditedStory()"
+      (keyup.escape)="cancelEdit()"
+      placeholder="Enter story name" />
     <div class="modal-buttons">
-      <button (click)="saveEditedStory()">Save</button>
+      <button (click)="saveEditedStory()" [disabled]="!storyEditText.trim()">Save</button>
       <button (click)="cancelEdit()">Cancel</button>
     </div>
   </div>
 </div>
+
+<!-- Offline/Connection Lost Notice -->
+<div class="offline-notice" *ngIf="!isConnected">
+  <div class="notice-content">
+    <h4>⚠️ Connection Lost</h4>
+    <p>Attempting to reconnect... Some features may be limited.</p>
+  </div>
+</div>
+
+

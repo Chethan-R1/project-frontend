@@ -1,0 +1,9 @@
+<div class="signup-wrapper">
+  <h2>Create Account</h2>
+  <form (ngSubmit)="onSignup()" #signupForm="ngForm">
+    <input type="text" name="name" [(ngModel)]="name" placeholder="Name" required />
+    <input type="email" name="email" [(ngModel)]="email" placeholder="Email" required />
+    <input type="password" name="password" [(ngModel)]="password" placeholder="Password" required />
+    <button type="submit" [disabled]="!signupForm.form.valid">Sign Up</button>
+  </form>
+</div>

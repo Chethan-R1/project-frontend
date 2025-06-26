@@ -1,41 +1,3 @@
-// import { Component } from '@angular/core';
-// import { Router } from '@angular/router';
-// import { HttpClient } from '@angular/common/http';
-// import { CommonModule } from '@angular/common';
-// import { FormsModule } from '@angular/forms';
-// import { UserService } from '../../services/user.service';
-// import { User } from '../../models/user.model';
-
-// @Component({
-//   selector: 'app-login',
-//   imports:[CommonModule, FormsModule],
-//   templateUrl: './login.component.html',
-//   styleUrls: ['./login.component.css']
-// })
-// export class LoginComponent {
-//  guestName: string = '';
-
-//   constructor(private router: Router, private userService: UserService) {}
-
-// onGuestLogin() {
-//   if (this.guestName.trim()) {
-//     this.userService.getOrCreateUser(this.guestName).subscribe({
-//       next: (user) => {
-//         localStorage.setItem('userId', user.id || '');
-//         localStorage.setItem('userName', user.name);
-//         this.router.navigate(['/planning-table']);
-//       },
-//       error: (err) => {
-//         alert('Error during login');
-//         console.error(err);
-//       }
-//     });
-//   }
-// }
-
-
-// }
-
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -52,37 +14,77 @@ import { UserService } from '../../services/user.service';
 export class LoginComponent {
   guestName: string = '';
 
+  showLoginForm: boolean = false;
+  showSignupForm: boolean = false;
+
+  loginEmail: string = '';
+  loginPassword: string = '';
+
+  signupName: string = '';
+  signupEmail: string = '';
+  signupPassword: string = '';
+
   constructor(private router: Router, private userService: UserService) {}
-
-  navigateToSignup() {
-  this.router.navigate(['/create-account']); 
-}
-
 
   onGuestLogin() {
     if (this.guestName.trim()) {
       this.userService.getOrCreateUser(this.guestName).subscribe({
         next: (user) => {
-          // Save user info
           localStorage.setItem('userId', user.id || '');
           localStorage.setItem('userName', user.name);
 
           const redirectUrl = localStorage.getItem('redirectAfterLogin');
           localStorage.removeItem('redirectAfterLogin');
-
-          if (redirectUrl) {
-              this.router.navigateByUrl(redirectUrl);
-             } else {
-               this.router.navigate(['/planning-table']);
-          }
+          this.router.navigateByUrl(redirectUrl || '/planning-table');
         },
-
-          
         error: (err) => {
-          alert('Error during login');
+          alert('Error during guest login');
           console.error(err);
         }
       });
     }
+  }
+
+  toggleLoginForm() {
+    this.showLoginForm = true;
+    this.showSignupForm = false;
+  }
+
+  switchToSignup(event: Event) {
+    event.preventDefault();
+    this.showLoginForm = false;
+    this.showSignupForm = true;
+  }
+
+  switchToLogin(event: Event) {
+    event.preventDefault();
+    this.showLoginForm = true;
+    this.showSignupForm = false;
+  }
+
+  onLogin() {
+    console.log('Login:', this.loginEmail, this.loginPassword);
+    alert('Login successful (mock)');
+    this.router.navigate(['/planning-table']);
+  }
+
+  onSignup() {
+    const newUser = {
+      name: this.signupName,
+      email: this.signupEmail,
+      password: this.signupPassword
+    };
+
+    this.userService.create(newUser).subscribe({
+      next: (user) => {
+        localStorage.setItem('userId', user.id || '');
+        localStorage.setItem('userName', user.name);
+        this.router.navigate(['/planning-table']);
+      },
+      error: (err) => {
+        alert('Error during signup');
+        console.error(err);
+      }
+    });
   }
 }

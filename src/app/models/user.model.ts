@@ -1,4 +1,6 @@
 export interface User {
-  id: string;      
+  id: string;  
+  moderator:boolean;
   name: string;
+  username: string;
 }

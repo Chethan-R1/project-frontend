@@ -1,66 +1,119 @@
+/* Root header styles */
 .header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  background-color: #1976d2;
-  color: white;
-  padding: 0.75rem 2rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  justify-content: space-between;
+  background-color: var(--header-bg);
+  color: var(--text-color);
+  padding: 0.75rem 1.5rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  position: relative;
+  z-index: 1000;
 }
 
+/* Logo section */
 .logo {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 1.5rem;
-  font-weight: bold;
 }
 
 .logo img {
-  height: 32px;
-  width: auto;
+  height: 40px;
+  border-radius: 6px;
 }
 
-.user-section {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 1rem;
+.logo span {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--text-color);
 }
 
-.user-icon {
-  font-size: 1.3rem;
-}
-
+/* User section */
 .user-section {
   position: relative;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
 }
 
+.user-icon {
+  font-size: 1.2rem;
+}
+
+.username {
+  font-size: 1rem;
+}
+
+/* Dropdown */
 .dropdown {
   position: absolute;
-  top: 40px;
+  top: 120%;
   right: 0;
-  background-color: rgb(255, 255, 255);
-  border: 1px solid #ffffff;
-  color: black;
-  z-index: 1000;
-  width: 150px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: var(--dropdown-bg);
+  border-radius: 8px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  animation: dropdownFade 0.25s ease-out;
+  min-width: 180px;
 }
 
 .dropdown ul {
-  list-style-type: none;
-  padding: 0;
+  list-style: none;
   margin: 0;
+  padding: 0;
 }
 
 .dropdown li {
-  padding: 10px;
-  border-bottom: 1px solid #eee;
+  padding: 10px 16px;
   cursor: pointer;
+  color: var(--text-color);
+  transition: background-color 0.2s ease;
 }
 
 .dropdown li:hover {
-  background-color: #638ce5;
+  background-color: var(--hover-bg);
+}
+
+/* Guest styling */
+.guest {
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+/* Animations */
+@keyframes dropdownFade {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive (optional) */
+@media (max-width: 600px) {
+  .logo span {
+    font-size: 1.2rem;
+  }
+
+  .username {
+    display: none;
+  }
+}
+
+.theme-toggle {
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: var(--text-color);
+  margin-left: 1rem;
+  transition: transform 0.2s ease;
+}
+
+.theme-toggle:hover {
+  transform: scale(1.1);
 }

@@ -3,12 +3,19 @@
     <img src="assets/logo.jpg" alt="PlanITPoker" />
     <span>PlanITPoker</span>
   </div>
+
   <nav class="nav-links">
+    <!-- Reserved for future nav -->
   </nav>
-  <div class="user-section" (click)="toggleDropdown()">
+
+  <div class="theme-toggle">
+  <i class="fas" [ngClass]="isDarkMode ? 'fa-sun' : 'fa-moon'" (click)="toggleTheme()"></i>
+  </div>
+
+  <div class="user-section" (click)="toggleDropdown()" *ngIf="isLoggedIn">
     <span class="user-icon">👤</span>
-    <span class="username">{{userName}}</span>
-        <div class="dropdown" *ngIf="dropdownOpen">
+    <span class="username">{{ userName }}</span>
+    <div class="dropdown" *ngIf="dropdownOpen">
       <ul>
         <li (click)="navigateTo('organization')">Organization</li>
         <li (click)="navigateTo('create-account')">Create Account</li>
@@ -16,10 +23,9 @@
       </ul>
     </div>
   </div>
-<!-- 
-  <div class="user-section" *ngIf="!isLoggedIn">
-  <span class="user-icon">👤</span>
-  <span class="username">Guest</span>
-</div> -->
 
+  <div class="user-section guest" *ngIf="!isLoggedIn">
+    <span class="user-icon">👤</span>
+    <span class="username">Guest</span>
+  </div>
 </header>
